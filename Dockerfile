@@ -26,7 +26,7 @@ FROM jboss-eap-7/eap71-openshift:1.3-17
 ENV SUMMARY="Red Hat CodeReady Workspaces Operator container" \
     DESCRIPTION="Red Hat CodeReady Workspaces Operator container" \
     PRODNAME="codeready-workspaces" \
-    COMPNAME="operator"
+    COMPNAME="operator-container"
 
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
