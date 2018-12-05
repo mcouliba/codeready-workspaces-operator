@@ -12,6 +12,28 @@
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/devtools/go-toolset-7-rhel7
 FROM devtools/go-toolset-7-rhel7:1.10.2-10 as builder
 
+ENV SUMMARY="Red Hat CodeReady Workspaces Operator container" \
+    DESCRIPTION="Red Hat CodeReady Workspaces Operator container" \
+    PRODNAME="codeready-workspaces" \
+    COMPNAME="operator"
+
+LABEL summary="$SUMMARY" \
+      description="$DESCRIPTION" \
+      io.k8s.description="$DESCRIPTION" \
+      io.k8s.display-name="Red Hat CodeReady Workspaces for OpenShift - Operator" \
+      io.openshift.tags="$PRODNAME,$COMPNAME" \
+      com.redhat.component="$PRODNAME-$COMPNAME" \
+      name="$PRODNAME/$COMPNAME" \
+      version="1.0.0.GA" \
+      license="EPLv2" \
+      maintainer="Nick Boldt <nboldt@redhat.com>" \
+      io.openshift.expose-services="" \
+      usage=""
+
+# uncomment to run a local build
+#RUN subscription-manager register --username username --password password --auto-attach
+#RUN subscription-manager repos --enable rhel-7-server-optional-rpms -enable rhel-server-rhscl-7-rpms
+
 ADD . /go/src/github.com/eclipse/che-operator
 RUN OOS=linux GOARCH=amd64 CGO_ENABLED=0 \
     go build -o /tmp/che-operator/che-operator \
