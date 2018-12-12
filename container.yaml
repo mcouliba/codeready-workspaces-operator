@@ -7,14 +7,11 @@ platforms:
 
 # disable this for now, no yum packages to install
 # see https://mojo.redhat.com/docs/DOC-1159997#jive_content_id_Pulp_Repositories_and_Content_Sets
-compose:
-  packages:
-  # - rh-python36-python-psycopg2
-
+#compose:
   # TODO: this should be beta or release once we get everything built in brew, but for alpha / tech preview unsigned is acceptable
   #signing_intent: unsigned
   # NOTE: pulp_repos = true will use content_sets.yml to install package sets
-  pulp_repos: true
+  #pulp_repos: true
 
 # instead of docker_api, use imagebuilder for multistage builds
 image_build_method: imagebuilder
