@@ -13,9 +13,7 @@ package util
 
 const (
 	// Docker image for Che server. Defaults to eclipse/che-server:latest
-	CheImageRepo = "CHE_IMAGE_REPO"
-	// Docker image for Che server. Defaults to eclipse/che-server:latest
-	CheImageTag = "CHE_IMAGE_TAG"
+	CheImage = "CHE_IMAGE"
 	// support of https routes
 	TlsSupport = "TLS_SUPPORT"
 	// PVC strategy for Che workspaces
@@ -68,4 +66,6 @@ const (
 	WorkspaceHttpsProxy          = "WORKSPACE_HTTPS_PROXY"
 	WorkspaceNoProxy             = "WORKSPACE_NO_PROXY"
 	PluginRegistryUrl            = "PLUGIN_REGISTRY_URL"
+	UpdateCheAdminPassword = "UPDATE_CHE_ADMIN_PASSWORD"
+	WaitDeploymentTimeout = "WAIT_DEPLOYMENT_TIMEOUT"
 )

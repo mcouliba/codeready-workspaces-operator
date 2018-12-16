@@ -50,7 +50,7 @@ func newRole(name string) *rbac.Role {
 	}
 }
 
-func CreateNewRole(name string) (*rbac.Role) {
+func CreateNewRole(name string) *rbac.Role {
 	role := newRole(name)
 	if err := sdk.Create(role); err != nil && !errors.IsAlreadyExists(err) {
 		logrus.Errorf("Failed to create "+name+" role : %v", err)

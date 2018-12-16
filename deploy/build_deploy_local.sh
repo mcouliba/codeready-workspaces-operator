@@ -59,8 +59,8 @@ ${CMD} create rolebinding che-operator --clusterrole=admin --serviceaccount=${NA
 
 ${CMD} create -f ${BASE_DIR}/config.yaml -n=${NAMESPACE}
 ${CMD} patch cm/che-operator -p "{\"data\": {\"INGRESS_DOMAIN\": \"${INGRESS_DOMAIN}\", \"OPENSHIFT_API_URL\": \"${OPENSHIFT_API_URL}\"}}" -n ${NAMESPACE}
-
-${CMD} run -ti "${NAMESPACE}" \
+${CMD} delete pod che-operator -n=${NAMESPACE}  2> /dev/null || true
+${CMD} run -ti "che-operator" \
         --restart='Never' \
         --serviceaccount='che-operator' \
         --image='che-operator' \

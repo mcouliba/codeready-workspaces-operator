@@ -14,12 +14,12 @@ package operator
 import (
 	"github.com/eclipse/che-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
+	"strings"
 )
 
 var (
 	// general config
 	namespace         = util.GetNamespace()
-	infra             = util.GetInfra()
 	protocol          = "http"
 	wsprotocol        = "ws"
 	cheHost           string
@@ -29,6 +29,7 @@ var (
 	selfSignedCert    = util.GetEnv(util.SelfSignedCert, "")
 	openshiftOAuth    = util.GetEnvBool(util.OpenShiftOauth, false)
 	oauthSecret       = util.GeneratePasswd(12)
+	oAuthClientName   = "openshift-identity-provider-" + strings.ToLower(util.GeneratePasswd(4))
 	hostAliasIP       = util.GetEnv(util.HostAliasIP, "10.10.10.10")
 	hostAliasHostname = util.GetEnv(util.HostAliasHostname, "example.com")
 	hostAliases       = []corev1.HostAlias{
@@ -39,6 +40,7 @@ var (
 			},
 		},
 	}
+	updateAdminPassword = util.GetEnvBool(util.UpdateCheAdminPassword, true)
 
 	// proxy config
 
@@ -49,7 +51,7 @@ var (
 	cheWorkspaceNoProxy          = util.GetEnv(util.WorkspaceNoProxy, "")
 
 	// plugin registry url
-	pluginRegistryUrl            = util.GetEnv(util.PluginRegistryUrl, "")
+	pluginRegistryUrl = util.GetEnv(util.PluginRegistryUrl, "https://che-plugin-registry.openshift.io")
 
 	// k8s specific config
 
@@ -76,8 +78,7 @@ var (
 	keycloakRealm            = util.GetEnv(util.ExternalKeycloakRealm, "codeready")
 	keycloakClientId         = util.GetEnv(util.ExternalKeycloakClientId, "codeready-public")
 
-	cheImageRepo = util.GetEnv(util.CheImageRepo, "eclipse/che-server")
-	cheImageTag  = util.GetEnv(util.CheImageTag, "latest")
+	cheImage = util.GetEnv(util.CheImage, "eclipse/che-server:latest")
 
 	postgresLabels = map[string]string{"app": "postgres"}
 	keycloakLabels = map[string]string{"app": "keycloak"}

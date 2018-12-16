@@ -57,5 +57,4 @@ func CreateRoleBinding(kind string, name string, serviceAccountName string, role
 		return nil
 	}
 	return rb
-
 }

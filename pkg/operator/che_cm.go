@@ -28,6 +28,7 @@ func addMap(a map[string]string, b map[string]string) {
 }
 
 func newCheConfigMap(cheHost string, keycloakURL string) *corev1.ConfigMap {
+	infra := util.GetInfra()
 	cheLabels := map[string]string{"app": "che"}
 	openshiftOAuth := util.GetEnvBool(util.OpenShiftOauth, false)
 	ingressDomain := util.GetEnv(util.IngressDomain, "")

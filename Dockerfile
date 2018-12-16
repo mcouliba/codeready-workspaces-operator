@@ -22,11 +22,12 @@ USER root
 #RUN subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-server-rhscl-7-rpms
 
 ADD . /go/src/github.com/eclipse/che-operator
+RUN pushd /go/src/github.com/eclipse/che-operator && go test -v ./... && popd
 RUN pushd /go/src/github.com/eclipse/che-operator/ && \
     OOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/che-operator/che-operator \
     /go/src/github.com/eclipse/che-operator/cmd/che-operator/main.go && popd
 
-FROM jboss-eap-7/eap71-openshift:1.3-17
+FROM rhel8:8.0-760
 
 ENV SUMMARY="Red Hat CodeReady Workspaces Operator container" \
     DESCRIPTION="Red Hat CodeReady Workspaces Operator container" \
@@ -48,10 +49,6 @@ LABEL summary="$SUMMARY" \
       io.openshift.expose-services="" \
       usage=""
 
-USER root
 COPY --from=builder /tmp/che-operator/che-operator /usr/local/bin/che-operator
 COPY --from=builder /go/src/github.com/eclipse/che-operator/deploy/keycloak_provision /tmp/keycloak_provision
-
-RUN adduser che-operator
-USER che-operator
 CMD ["che-operator"]

@@ -11,7 +11,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #set -e
 BASE_DIR=$(cd "$(dirname "$0")"; pwd)
-if [[ $1 = "k8s" || $1 = "minikube" ]]; then
+if [[ $1 = "k8s" || $1 = "minikube" || $1 = "docker4mac" ]]; then
     CMD="kubectl"
     CREATE_PROJECT="create namespace"
 else
@@ -29,8 +29,17 @@ if [[ $1 = "minikube" ]]; then
     fi
     INGRESS_DOMAIN="${MINIKUBE_IP}.nip.io"
     echo "Using MiniKube ingress domain: "${INGRESS_DOMAIN}
- fi
+fi
 
+if [[ $1 = "docker4mac" ]]; then
+    K8S_IP="$(${CMD} get services --namespace ingress-nginx -o jsonpath='{.items[*].spec.clusterIP}')"
+    if [[ -z "${K8S_IP}" ]]; then
+        echo "Failed to get Ingress Cluster IP"
+        exit 1
+    fi
+    INGRESS_DOMAIN="${K8S_IP}.nip.io"
+    echo "Using Docker4Mac ingress domain: ${INGRESS_DOMAIN}"
+fi
 
 if [[ -z "$2" ]]; then
     NAMESPACE="eclipse-che"

@@ -12,7 +12,6 @@
 package operator
 
 import (
-	"github.com/eclipse/che-operator/pkg/util"
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	"github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
@@ -24,7 +23,7 @@ import (
 	"time"
 )
 
-func newCheDeployment(cheImageRepo string, cheImageTag string) *appsv1.Deployment {
+func newCheDeployment(cheImage string) *appsv1.Deployment {
 	cheLabels := map[string]string{"app": "che"}
 	optionalEnv := true
 	return &appsv1.Deployment{
@@ -40,7 +39,7 @@ func newCheDeployment(cheImageRepo string, cheImageTag string) *appsv1.Deploymen
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{MatchLabels: cheLabels},
 			Strategy: appsv1.DeploymentStrategy{
-				Type: appsv1.DeploymentStrategyType("Recreate"),
+				Type: appsv1.RollingUpdateDeploymentStrategyType,
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
@@ -53,7 +52,7 @@ func newCheDeployment(cheImageRepo string, cheImageTag string) *appsv1.Deploymen
 						{
 							Name:            "che",
 							ImagePullPolicy: corev1.PullIfNotPresent,
-							Image:           cheImageRepo + ":" + cheImageTag,
+							Image:           cheImage,
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "http",
@@ -145,14 +144,15 @@ func newCheDeployment(cheImageRepo string, cheImageTag string) *appsv1.Deploymen
 }
 
 // CreateCheDeployment creates a deployment with che ConfigMap in env
-func CreateCheDeployment(cheImageRepo string, cheImageTag string) (*appsv1.Deployment, error) {
-	deployment := newCheDeployment(cheImageRepo, cheImageTag)
+func CreateCheDeployment(cheImage string) (*appsv1.Deployment, error) {
+	k8s := GetK8SConfig()
+	deployment := newCheDeployment(cheImage)
 	if err := sdk.Create(deployment); err != nil && !errors.IsAlreadyExists(err) {
 		logrus.Errorf("Failed to create Che deployment : %v", err)
 		return nil, err
 	}
 	// wait until deployment is scaled to 1 replica to proceed with other deployments
-	util.GetDeploymentStatus(deployment)
+	k8s.GetDeploymentStatus(deployment)
 	logrus.Info("Che is available at: " + protocol + "://" + cheHost)
 	deploymentTime := time.Since(StartTime)
 	logrus.Info("Deployment took ", deploymentTime)

@@ -47,5 +47,5 @@ func printVersion() {
 
 func main() {
 	printVersion()
-	operator.ReconsileChe()
+	operator.ReconcileChe()
 }
