@@ -22,7 +22,7 @@ USER root
 #RUN subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-server-rhscl-7-rpms
 
 ADD . /go/src/github.com/eclipse/che-operator
-RUN pushd /go/src/github.com/eclipse/che-operator && go test -v ./... && popd
+RUN pushd /go/src/github.com/eclipse/che-operator && go test -v ./...
 RUN pushd /go/src/github.com/eclipse/che-operator/ && \
     OOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/che-operator/che-operator \
     /go/src/github.com/eclipse/che-operator/cmd/che-operator/main.go && popd
