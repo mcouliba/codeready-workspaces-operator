@@ -46,7 +46,6 @@ func newCheDeployment(cheImage string) *appsv1.Deployment {
 					Labels: cheLabels,
 				},
 				Spec: corev1.PodSpec{
-					HostAliases:        hostAliases,
 					ServiceAccountName: "che",
 					Containers: []corev1.Container{
 						{
@@ -116,7 +115,6 @@ func newCheDeployment(cheImage string) *appsv1.Deployment {
 								},
 							},
 							Env: []corev1.EnvVar{
-								// todo Add OPENSHIFT_SELF_SIGNED_CERT form secret
 								{
 									Name: "OPENSHIFT_KUBE_PING_NAMESPACE",
 									ValueFrom: &corev1.EnvVarSource{
@@ -124,12 +122,12 @@ func newCheDeployment(cheImage string) *appsv1.Deployment {
 											FieldPath: "metadata.namespace"}},
 								},
 								{
-									Name: "OPENSHIFT_IDENTITY_PROVIDER_CERTIFICATE",
+									Name: "CHE_SELF__SIGNED__CERT",
 									ValueFrom: &corev1.EnvVarSource{
 										SecretKeyRef: &corev1.SecretKeySelector{
 											Key: "ca.crt",
 											LocalObjectReference: corev1.LocalObjectReference{
-												Name: "self-signed-cert",
+												Name: "self-signed-certificate",
 											},
 											Optional: &optionalEnv,
 										},

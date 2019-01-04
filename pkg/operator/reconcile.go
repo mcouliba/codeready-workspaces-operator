@@ -23,7 +23,7 @@ import (
 var StartTime = time.Now()
 
 func ReconcileChe() {
-	infra             := util.GetInfra()
+	infra := util.GetInfra()
 	k8s := GetK8SConfig()
 	// service accounts, roles and role-binding for Che
 	CreateServiceAccount("che")
@@ -55,14 +55,14 @@ func ReconcileChe() {
 	}
 	// create Che route when on OpenShift infra
 	if infra == "openshift" {
-		rt, _ := CreateRouteIfNotExists("che", "che-host")
+		rt, _ := CreateRouteIfNotExists(cheFlavor, "che-host")
 		cheHost = rt.Spec.Host
 	} else {
 		// create Che ingress when on k8s infra
-		CreateIngressIfNotExists("che", "che-host", 8080)
+		CreateIngressIfNotExists(cheFlavor, "che-host", 8080)
 		cheHost = ingressDomain
 		if strategy == "multi-host" {
-			cheHost = "che-" + namespace + "." + ingressDomain
+			cheHost = cheFlavor + "-" + namespace + "." + ingressDomain
 		}
 	}
 
@@ -98,6 +98,9 @@ func ReconcileChe() {
 	err := sdk.Update(cheConfigMap)
 	if err != nil {
 		logrus.Errorf("Failed to update Che configmap : %v", err)
+	}
+	if cheFlavor == "codeready" {
+		cheImage = util.GetEnv("CHE_IMAGE", "registry.access.redhat.com/codeready-workspaces-beta/server:latest")
 	}
 	cheDc, _ := CreateCheDeployment(cheImage)
 	err = sdk.Update(cheDc)

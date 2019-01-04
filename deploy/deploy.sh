@@ -57,7 +57,7 @@ ${CMD} create serviceaccount che-operator -n=${NAMESPACE}
 ${CMD} create rolebinding che-operator --clusterrole=admin --serviceaccount=${NAMESPACE}:che-operator -n=${NAMESPACE}
 
 ${CMD} create -f ${BASE_DIR}/config.yaml -n=${NAMESPACE}
-${CMD} patch cm/che-operator -p "{\"data\": {\"INGRESS_DOMAIN\": \"${INGRESS_DOMAIN}\", \"OPENSHIFT_API_URL\": \"${OPENSHIFT_API_URL}\"}}" -n ${NAMESPACE}
+${CMD} patch cm/che-operator -p "{\"data\": {\"CHE_INFRA_KUBERNETES_INGRESS_DOMAIN\": \"${INGRESS_DOMAIN}\", \"CHE_OPENSHIFT_API_URL\": \"${OPENSHIFT_API_URL}\"}}" -n ${NAMESPACE}
 ${CMD} delete pod che-operator -n=${NAMESPACE}  2> /dev/null || true
 ${CMD} run -ti "che-operator" \
         --restart='Never' \

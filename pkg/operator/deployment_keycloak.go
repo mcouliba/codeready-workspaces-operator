@@ -29,23 +29,22 @@ var (
 	keycloakName               = "keycloak"
 	keycloakImage              = "registry.access.redhat.com/redhat-sso-7/sso72-openshift:1.2-8"
 	trustpass                  = util.GeneratePasswd(12)
-	addCertToTrustStoreCommand = "echo \"${SELF_SIGNED_CERTIFICATE}\" > /opt/eap/bin/openshift.crt" +
+	addCertToTrustStoreCommand = "echo \"${CHE_SELF__SIGNED__CERT}\" > /opt/eap/bin/openshift.crt" +
 		" && keytool -importcert -alias HOSTDOMAIN" +
 		" -keystore /opt/eap/bin/openshift.jks" +
 		" -file /opt/eap/bin/openshift.crt -storepass " + trustpass + " -noprompt" +
 		" && keytool -importkeystore -srckeystore $JAVA_HOME/jre/lib/security/cacerts" +
 		" -destkeystore /opt/eap/bin/openshift.jks" +
-		" -srcstorepass changeit -deststorepass " + trustpass +
-		" && sed -i 's/WILDCARD/ANY/g' /opt/eap/bin/launch/keycloak-spi.sh"
+		" -srcstorepass changeit -deststorepass " + trustpass
 
 	trustStoreCommandArg = " --truststore /opt/eap/bin/openshift.jks --trustpass " + trustpass + " "
-	startCommand         = "/opt/eap/bin/openshift-launch.sh -b 0.0.0.0"
+	startCommand         = "sed -i 's/WILDCARD/ANY/g' /opt/eap/bin/launch/keycloak-spi.sh && /opt/eap/bin/openshift-launch.sh -b 0.0.0.0"
 )
 
 func newKeycloakDeployment() *appsv1.Deployment {
 	optionalEnv := true
 	var command string
-	selfSignedCert := util.GetEnv(util.SelfSignedCert, "")
+	selfSignedCert := util.GetEnv("CHE_SELF__SIGNED__CERT", "")
 	ssoTrustStoreEnv := corev1.EnvVar{Name: "SSO_TRUSTSTORE", Value: "openshift.jks"}
 	ssoTrustStoreDir := corev1.EnvVar{Name: "SSO_TRUSTSTORE_DIR", Value: "/opt/eap/bin"}
 	ssoTrustStorePassword := corev1.EnvVar{Name: "SSO_TRUSTSTORE_PASSWORD", Value: trustpass,}
@@ -94,12 +93,12 @@ func newKeycloakDeployment() *appsv1.Deployment {
 			Value: "POSTGRES",
 		},
 		{
-			Name: "SELF_SIGNED_CERTIFICATE",
+			Name: "CHE_SELF__SIGNED__CERT",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					Key: "ca.crt",
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "self-signed-cert",
+						Name: "self-signed-certificate",
 					},
 					Optional: &optionalEnv,
 				},
@@ -134,8 +133,6 @@ func newKeycloakDeployment() *appsv1.Deployment {
 					Labels: keycloakLabels,
 				},
 				Spec: corev1.PodSpec{
-					// testing https on k8s
-					HostAliases: hostAliases,
 					Containers: []corev1.Container{
 						{
 							Name:            keycloakName,
@@ -201,7 +198,7 @@ func CreateKeycloakDeployment() (*appsv1.Deployment, error) {
 }
 
 func GetKeycloakProvisionCommand(keycloakURL string, cheHost string) (command string) {
-	openShiftApiUrl := util.GetEnv(util.OpenShiftApiUrl, "")
+	openShiftApiUrl := util.GetEnv("CHE_OPENSHIFT_API_URL", "")
 	requiredActions := ""
 	if updateAdminPassword {
 		requiredActions = "\"UPDATE_PASSWORD\""
@@ -210,12 +207,18 @@ func GetKeycloakProvisionCommand(keycloakURL string, cheHost string) (command st
 	if err != nil {
 		logrus.Errorf("Failed to find keycloak entrypoint file", err)
 	}
+	keycloakTheme := "keycloak"
+	if cheFlavor == "codeready" {
+		keycloakTheme = "rh-sso"
+
+	}
 	str := string(file)
 	r := strings.NewReplacer("$keycloakURL", keycloakURL,
 		"$keycloakAdminUserName", keycloakAdminUserName,
 		"$keycloakAdminPassword", keycloakAdminPassword,
 		"$keycloakRealm", keycloakRealm,
 		"$keycloakClientId", keycloakClientId,
+		"$keycloakTheme", keycloakTheme,
 		"$protocol", protocol,
 		"$cheHost", cheHost,
 		"$trustStoreCommandArg", trustStoreCommandArg,
@@ -231,12 +234,6 @@ func GetKeycloakProvisionCommand(keycloakURL string, cheHost string) (command st
 			" -s config.defaultScope=user:full" + trustStoreCommandArg
 
 	command = createRealmClientUserCommand
-	if len(selfSignedCert) > 0 {
-		command = addCertToTrustStoreCommand + " && " + createRealmClientUserCommand
-	}
-	if len(selfSignedCert) > 0 && openshiftOAuth {
-		command = addCertToTrustStoreCommand + " && " + createRealmClientUserCommand + " && " + createOpenShiftIdentityProviderCommand
-	}
 	if openshiftOAuth {
 		command = createRealmClientUserCommand + " && " + createOpenShiftIdentityProviderCommand
 	}

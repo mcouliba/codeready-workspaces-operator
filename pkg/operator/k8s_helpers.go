@@ -41,7 +41,7 @@ func GetK8SConfig() *k8s {
 // GetDeploymentStatus listens to deployment events and checks replicas once MODIFIED event is received
 func (o *k8s) GetDeploymentStatus(deployment *appsv1.Deployment)  {
 	api := o.clientset.AppsV1()
-	timeoutStr := util.GetEnv(util.WaitDeploymentTimeout, "420")
+	timeoutStr := util.GetEnv("WAIT_DEPLOYMENT_TIMEOUT", "420")
 	timeout, err := strconv.ParseInt(timeoutStr, 10, 64)
 	listOptions := metav1.ListOptions{
 		FieldSelector:  fields.OneTermEqualSelector("metadata.name", deployment.Name).String(),
@@ -66,8 +66,7 @@ func (o *k8s) GetDeploymentStatus(deployment *appsv1.Deployment)  {
 		//check before watching in case the deployment is already scaled to 1
 		err := sdk.Get(deployment)
 		if err != nil {
-			logrus.Errorf("Failed to get %s deployment: %s", deployment.Name, err)
-			panic(err)
+			logrus.Fatalf("Failed to get %s deployment: %s", deployment.Name, err)
 		}
 		if deployment.Status.AvailableReplicas == 1 {
 			logrus.Infof("%s successfully deployed", deployment.Name)

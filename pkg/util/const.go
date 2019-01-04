@@ -55,7 +55,7 @@ const (
 	// ingress class
 	IngressClass = "INGRESS_CLASS"
 	// ingress strategy
-	Strategy      = "INGRESS_STRATEGY"
+	Strategy      = "che"
 	TlsSecretName = "TLS_SECRET_NAME"
 	// fake DNS if you need it in deployments
 	HostAliasIP                  = "HOST_ALIAS_IP"

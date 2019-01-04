@@ -29,7 +29,7 @@ func newSecret() *corev1.Secret {
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "self-signed-cert",
+			Name:      "self-signed-certificate",
 			Namespace: namespace,
 			Labels:    labels,
 

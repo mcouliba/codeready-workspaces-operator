@@ -30,7 +30,7 @@ func TestNewCheConfigMap(t *testing.T) {
 
 	// set fake ingress domain env and check if configmap grabs its value
 	fakeDomain := "fake-domain"
-	fakeDomainEnv := "INGRESS_DOMAIN"
+	fakeDomainEnv := "CHE_INFRA_KUBERNETES_INGRESS_DOMAIN"
 	err = os.Setenv(fakeDomainEnv, fakeDomain)
 	if err != nil {
 		logrus.Fatal(err)
@@ -74,7 +74,7 @@ func TestNewPostgresDeployment(t *testing.T) {
 func TestNewKeycloakDeployment(t *testing.T) {
 
 	//// create a fake Keycloak deployment
-	err := os.Setenv("SELF_SIGNED_CERT", "mycrt")
+	err := os.Setenv("CHE_SELF__SIGNED__CERT", "mycrt")
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestNewKeycloakDeployment(t *testing.T) {
 	}
 	logrus.Infof("Deployment %s created", deployment.Name)
 
-	// check if setting self-signed cert updates env for the container properly
+	// check if setting self-signed-certificate cert updates env for the container properly
 	selfSignedEnv := deployment.Spec.Template.Spec.Containers[0].Env
 	var foundEnv bool
 	ssoEnv := "SSO_TRUSTSTORE"

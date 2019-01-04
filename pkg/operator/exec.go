@@ -3,7 +3,6 @@ package operator
 import (
 	"github.com/eclipse/che-operator/pkg/util"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 var (
@@ -20,9 +19,8 @@ func ExecIntoPod(podName string, provisionCommand string) {
 	// print std if operator is run in debug mode (TODO)
 	_, stderr, err := k8s.ExecToPod(command, podName, util.GetNamespace())
 	if err != nil {
-		logrus.Errorf("Error exec'ing into pod %v: ", err)
-		logrus.Error(stderr)
-		os.Exit(1)
+		logrus.Errorf("Error exec'ing into pod %v: , command: %s", err, command)
+		logrus.Fatalf(stderr)
 	}
 	logrus.Info("Provisioning completed")
 }
