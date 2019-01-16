@@ -10,12 +10,12 @@
 #   Red Hat, Inc. - initial API and implementation
 
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/devtools/go-toolset-7-rhel7
-FROM registry.access.redhat.com/devtools/go-toolset-1.10-rhel7:1.10.3-15 as builder
+FROM registry.access.redhat.com/devtools/go-toolset-1.10-rhel7:1.10.3 as builder
 
-ENV PATH=/opt/rh/go-toolset-7/root/usr/bin:$PATH \
+ENV PATH=/opt/rh/go-toolset-1.10/root/usr/bin:$PATH \
     GOPATH=/go/
 
-USER root
+#USER root
 
 # uncomment to run a local build
 #RUN subscription-manager register --username me --password mypwd --auto-attach
@@ -27,7 +27,7 @@ RUN pushd /go/src/github.com/eclipse/che-operator/ && \
     OOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /tmp/che-operator/che-operator \
     /go/src/github.com/eclipse/che-operator/cmd/che-operator/main.go && popd
 
-FROM rhel8:8.0-760
+FROM registry.access.redhat.com/rhel8-beta:8.0-760
 
 ENV SUMMARY="Red Hat CodeReady Workspaces Operator container" \
     DESCRIPTION="Red Hat CodeReady Workspaces Operator container" \
