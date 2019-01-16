@@ -24,7 +24,6 @@ import (
 )
 
 func newCheDeployment(cheImage string) *appsv1.Deployment {
-	cheLabels := map[string]string{"app": "che"}
 	optionalEnv := true
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
