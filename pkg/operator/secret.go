@@ -22,7 +22,6 @@ import (
 
 func newSecret() *corev1.Secret {
 	cert := util.GetSelfSignedCert()
-	labels := map[string]string{"app": "che"}
 	return &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
@@ -31,7 +30,7 @@ func newSecret() *corev1.Secret {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "self-signed-certificate",
 			Namespace: namespace,
-			Labels:    labels,
+			Labels:    cheLabels,
 
 		},
 		Data: map[string][]byte{

@@ -27,7 +27,7 @@ func newOAuthClient(name string, oauthSecret string, keycloakURL string, keycloa
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Labels: map[string]string{"app":"che"},
+			Labels:    cheLabels,
 		},
 
 		Secret: oauthSecret,

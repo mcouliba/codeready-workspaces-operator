@@ -30,7 +30,8 @@ func TestGetDeploymentPod(t *testing.T) {
 			Name:      "fake-pod",
 			Namespace: "eclipse-che",
 			Labels: map[string]string{
-				"app": "postgres",
+				"app": "codeready",
+				"component": "postgres",
 			},
 		},
 	})
